@@ -1,46 +1,42 @@
-{{ config (
-    materialized="table"
-)}}
+{{ config(materialized="table") }}
 
-WITH customers AS (
-    SELECT * FROM {{ ref('stg_customers') }}
-),
+WITH
+    customers AS (SELECT * FROM {{ ref("stg_customers") }}),
 
-orders AS (
-    SELECT * FROM {{ ref('stg_orders')}}
-),
+    orders AS (SELECT * FROM {{ ref("stg_orders") }}),
 
-customer_orders as (
+    customer_orders AS (
 
-    select
-        customer_id,
+       SELECT
+            customer_id,
 
-        min(order_date) as first_order_date,
-        max(order_date) as most_recent_order_date,
-        count(order_id) as number_of_orders
+            MIN(order_date) AS first_order_date,
+            MAX(order_date) AS most_recent_order_date,
+            COUNT(order_id) AS number_of_orders
 
-    from orders
+        FROM orders
 
-    group by 1
+        GROUP BY 1
 
-),
+    ),
 
-final as (
+    final AS (
 
-    select
-        customers.customer_id,
-        customers.first_name,
-        customers.last_name,
-        customer_orders.first_order_date,
-        customer_orders.most_recent_order_date,
-        coalesce(customer_orders.number_of_orders, 0) as number_of_orders
+        SELECT
+            customers.customer_id,
+            customers.first_name,
+            customers.last_name,
+            customer_orders.first_order_date,
+            customer_orders.most_recent_order_date,
+            COALESCE(customer_orders.number_of_orders, 0) AS number_of_orders
 
-    from customers
+        FROM customers
 
-    left join customer_orders using (customer_id)
+        LEFT JOIN customer_orders USING (customer_id)
 
-    order by customer_id
+        ORDER BY customer_id
 
-)
+    )
 
-select * from final
+SELECT *
+FROM final
