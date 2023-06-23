@@ -38,5 +38,4 @@ WITH
 
     )
 
-SELECT *
-FROM final
+SELECT * FROM final
