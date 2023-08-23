@@ -9,3 +9,4 @@ SELECT
     created as created_at
 
 FROM {{source('stripe', 'payment')}}
+ORDER BY id 

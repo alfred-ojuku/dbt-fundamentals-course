@@ -1,10 +1,10 @@
 WITH orders AS (
 
     SELECT
-        id AS order_id,
-        user_id AS customer_id,
-        order_date,
-        status
+        ID AS order_id,
+        USER_ID AS customer_id,
+        ORDER_DATE AS order_date,
+        STATUS AS status
 
     FROM {{source('jaffle_shop', 'orders')}}
 )

@@ -10,7 +10,7 @@ order_payments AS (
           SUM(CASE WHEN status = 'success' THEN amount END) AS amount
     FROM payments
     GROUP BY 1
-), 
+),
 final AS (
     SELECT orders.order_id,
            orders.customer_id,
@@ -22,3 +22,4 @@ final AS (
 )
 
 SELECT * FROM final
+ORDER BY order_id
