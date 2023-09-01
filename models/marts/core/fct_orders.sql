@@ -1,3 +1,5 @@
+{{config(materialized="table")}}
+
 WITH orders AS (
     SELECT * FROM {{ref('stg_orders')}}
 ),
