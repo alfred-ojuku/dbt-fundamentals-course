@@ -5,11 +5,14 @@ WITH payments AS (
 pivoted AS (
     SELECT 
         order_id,
-        SUM(CASE WHEN payment_method = 'bank_transfer' THEN amount ELSE 0 END) AS bank_transfer_amount,
-        SUM(CASE WHEN payment_method = 'credit_card' THEN amount ELSE 0 END) AS credit_card_amount,
-        SUM(CASE WHEN payment_method = 'coupon' THEN amount ELSE 0 END) AS coupon_amount,
-        SUM(CASE WHEN payment_method = 'gift_card' THEN amount ELSE 0 END) AS gift_card_amount
-    
+        {% set payment_methods = ['bank_transfer', 'credit_card', 'coupon', 'gift_card'] -%}
+        {% for payment_method in payment_methods %}
+          {%- if not loop.last -%}
+           SUM(CASE WHEN payment_method = '{{payment_method}}' THEN amount ELSE 0 END) AS {{payment_method}}_amount,
+           {% else -%}
+           SUM(CASE WHEN payment_method = '{{payment_method}}' THEN amount ELSE 0 END) AS {{payment_method}}_amount
+          {% endif -%}
+        {%endfor%} 
     FROM payments
     WHERE status = 'success'
     GROUP BY 1
