@@ -38,3 +38,7 @@ models:
  mart:
   core:
     +materialized: table
+
+seeds:
+  jaffle_shop:
+    +schema: dbt_seed_files

@@ -1,21 +1,39 @@
-{% set expand_json_query %}
-WITH expanded AS (
-SELECT JSON_EXTRACT_SCALAR(CanBusData, '$.RPM') AS RPM
-FROM `analytics-383819`.`telemetry`.`data`
-WHERE CanBusData IS NOT NULL
+{% macro expand_json() %}
+
+    {% set payment_methods = dbt_utils.get_column_values(table=source("telemetry", 'data'), where="CanBusData IS NOT NULL", column='CanBusData') %}
+    {{ payment_methods }}
+
+    {%- call statement('dictionary', fetch_result=True) -%}
+      SELECT CanBusData FROM `analytics-383819`.`telemetry`.`data`
+      WHERE CanBusData IS NOT NULL
+    {%- endcall -%}
+
+    {%- set dict = load_result('dictionary')['data'][0][0] -%}
+    {{ dict }}
+
+
+
+
+    {%- set list = [] -%}
+    {%- for key in dict.keys() -%}
+        {% set _ = list1.append(key) %}
+    {%- endfor -%}
+    {{ list }}
+
+   WITH expanded AS (
+    
+    SELECT 
+    {% for key in list1 %}
+        
+    JSON_EXTRACT_SCALAR(CanBusData, '$.{{ key }}') AS {{ key }}
+        {%- if not loop.last %}
+            ,
+        {%- endif -%}
+    {% endfor %}
+   FROM `analytics-383819`.`telemetry`.`data`
+   WHERE CanBusData IS NOT NULL
+
 )
 SELECT * FROM expanded
-{% endset %}
-{% set results = run_query(expand_json_query) %}
-{{results}}
 
-
-{% set database = target.database%}
-{% set schema =  target.schema%}
-SELECT 
-      table_type,
-      table_name,
-      table_schema,
-      last_altered
-FROM {{database}}.information_schema.tables
-WHERE table_schema = upper('{{schema}}')
+{% endmacro %}

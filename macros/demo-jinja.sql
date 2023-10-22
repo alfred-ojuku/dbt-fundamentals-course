@@ -83,6 +83,16 @@
 SELECT * FROM expanded
 
 
+SELECT
+  {% for key in dic.keys() %}
+  JSON_EXTRACT(CanBusData, '$.{{key}}') AS {{key}}
+  {%- if not loop.last -%}
+    ,
+  {%- endif -%}
+  {% endfor %}
+FROM
+  `analytics-383819`.`telemetry`.`data`
+
 
 
 -- Hubspot JSON
